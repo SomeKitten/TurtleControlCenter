@@ -1,0 +1,31 @@
+body {
+  overflow: hidden;
+}
+
+canvas {
+  position: absolute;
+}
+
+#main {
+  left: 0px;
+  top: 0px;
+}
+
+#inventory {
+  z-index: 1;
+  left: 0px;
+  top: 64px;
+}
+
+#turtleList {
+  z-index: 1;
+  left: 0px;
+  top: 0px;
+}
+
+#controls {
+  position: absolute;
+  z-index: 1;
+  right: 0px;
+  top: 64px;
+}
