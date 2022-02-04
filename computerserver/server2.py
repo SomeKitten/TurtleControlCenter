@@ -63,6 +63,8 @@ blocks = []
 previnventory = {}
 inventory = {}
 
+stopping = False
+
 
 async def set_block(block):
     global block_index, block_set
@@ -134,7 +136,8 @@ async def communications(websocket, path):
                 # print(current_positions[client_name])
 
                 # outbound = "print('Idle...')"
-                outbound = "print(turtle.data.getPos())"
+                # outbound = "print(turtle.data.getPos())"
+                outbound = "turtle = turtle"  # noop
                 if len(commands) > 0:
                     if client_name in commands.keys():
                         outbound = commands[client_name]
@@ -236,10 +239,11 @@ async def communications(websocket, path):
 
 
 async def main():
+    global stopping
     while True:
         command = await aioconsole.ainput("--")
         if command == "stop":
-            break
+            stopping = True
 
 
 def start():
@@ -257,7 +261,8 @@ def start():
     except FileNotFoundError:
         pass
 
-    start_server = websockets.serve(communications, None, 63617, compression=None)
+    start_server = websockets.serve(
+        communications, None, 63617, compression=None)
 
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_until_complete(main())

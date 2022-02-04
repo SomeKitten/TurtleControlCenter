@@ -65,6 +65,8 @@ function logistics.clearWaste(turtle)
     local oldPos = {
         turtle.mobility.pos[1], turtle.mobility.pos[2], turtle.mobility.pos[3]
     }
+    local oldRot = turtle.mobility.rot
+
     turtle.mobility.home(turtle)
 
     local cobblestoneStack = false
@@ -116,6 +118,7 @@ function logistics.clearWaste(turtle)
     logistics.sort()
 
     turtle.mobility.moveto(turtle, oldPos)
+    turtle.mobility.turnDeg(turtle, oldRot)
 end
 
 function logistics.sort()
@@ -125,7 +128,11 @@ function logistics.sort()
         if turtle.getItemCount(i) == 0 then table.insert(emptySpaces, i) end
     end
 
-    while #emptySpaces > 1 do
+    if #emptySpaces == 0 then
+        print("FULL")
+        turtle.logistics.stop = true
+    end
+    while #emptySpaces > 0 do
         if logistics.sorted(turtle) then break end
 
         for i = 16, 2, -1 do
@@ -137,10 +144,8 @@ function logistics.sort()
             end
         end
     end
-    if #emptySpaces <= 1 then
-        print("FULL")
-        turtle.logistics.stop = true
-    end
+
+    turtle.select(1)
 end
 
 function logistics.deposit(turtle)

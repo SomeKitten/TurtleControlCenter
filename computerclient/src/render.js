@@ -64,7 +64,7 @@ class Render {
     autoMineForward.type = "number";
     autoMineForward.value = 5;
     autoMineForward.min = 1;
-    autoMineForward.max = 20;
+    autoMineForward.max = 50;
     this.controls.appendChild(autoMineForward);
 
     autoMineRight = document.createElement("input");

@@ -5,17 +5,20 @@ mobility.rot = 90
 local function report(turtle)
     if turtle.getItemCount(16) == 0 then
         local has_block, data = turtle.inspectDown()
-        if has_block and data.tags["forge:ores"] then
+        if has_block and
+            (data.tags["forge:ores"] or string.find(data.name, "ore", 1, true)) then
             turtle.mobility.digDown(turtle)
         end
 
         local has_block, data = turtle.inspect()
-        if has_block and data.tags["forge:ores"] then
+        if has_block and
+            (data.tags["forge:ores"] or string.find(data.name, "ore", 1, true)) then
             turtle.mobility.dig(turtle)
         end
 
         local has_block, data = turtle.inspectUp()
-        if has_block and data.tags["forge:ores"] then
+        if has_block and
+            (data.tags["forge:ores"] or string.find(data.name, "ore", 1, true)) then
             turtle.mobility.digUp(turtle)
         end
     end
@@ -24,7 +27,7 @@ local function report(turtle)
                turtle.data.getBlocks() .. ";" .. turtle.data.getInventory()
     server.send(info)
     msg, _ = server.receive()
-    print("Received and disregarding: " .. msg)
+    -- print("Received and disregarding: " .. msg)
 end
 
 function mobility.turnLeft(turtle)
@@ -197,7 +200,7 @@ end
 function mobility.home(turtle)
     print("Returning home!")
     mobility.moveto(turtle, {0, 0, 0})
-    mobility.turnDeg(turtle, 90)
+    -- mobility.turnDeg(turtle, 90)
 end
 
 return mobility

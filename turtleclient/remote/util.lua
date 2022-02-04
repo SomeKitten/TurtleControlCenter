@@ -9,4 +9,8 @@ function u.strsplit(inputstr, sep)
     return t
 end
 
+function u.ends_with(str, ending)
+    return ending == "" or str:sub(-#ending) == ending
+end
+
 return u

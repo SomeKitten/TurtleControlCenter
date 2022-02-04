@@ -1,4 +1,4 @@
-local util = require("util")
+turtle.util = require("util")
 
 turtle.data = require "data"
 turtle.mobility = require "mobility"
@@ -45,9 +45,9 @@ if fs.exists("turtle.info") then
     info = f:read()
     f:close()
 
-    infot = util.strsplit(info, ";")
+    infot = turtle.util.strsplit(info, ";")
     turtle.mobility.rot = tonumber(infot[1])
-    turtle.mobility.pos = util.strsplit(infot[2], ",")
+    turtle.mobility.pos = turtle.util.strsplit(infot[2], ",")
 end
 
 while true do
