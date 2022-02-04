@@ -11,19 +11,18 @@ function data.getInventory()
             log = log .. "minecraft:air,0,"
         end
     end
-    return log:sub(1,-2)
+    return log:sub(1, -2)
 end
 
 function data.getPos()
-    return turtle.mobility.pos[1] .. ","
-        .. turtle.mobility.pos[2] .. ","
-        .. turtle.mobility.pos[3]
+    return turtle.mobility.pos[1] .. "," .. turtle.mobility.pos[2] .. "," ..
+               turtle.mobility.pos[3]
 end
 
 function getBlock(detect)
     local isblock, data = detect()
 
-    if isblock then
+    if isblock and not string.find(data.name, "computercraft", 1, true) then
         return data.name
     else
         return "false"
@@ -31,9 +30,8 @@ function getBlock(detect)
 end
 
 function data.getBlocks()
-    return getBlock(turtle.inspectDown) .. ";"
-        .. getBlock(turtle.inspect) .. ";"
-        .. getBlock(turtle.inspectUp)
+    return getBlock(turtle.inspectDown) .. ";" .. getBlock(turtle.inspect) ..
+               ";" .. getBlock(turtle.inspectUp)
 end
 
 return data

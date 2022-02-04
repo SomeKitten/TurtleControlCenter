@@ -51,13 +51,7 @@ block_index = 0
 
 block_set = False
 
-# for name in turtle_names:
-#     positions[name] = ["90;0,0,0"]
-
 current_positions = {}
-
-# for name in turtle_names:
-#     current_positions[name] = "90;0,0,0"
 
 blocks = []
 previnventory = {}
@@ -95,16 +89,7 @@ async def communications(websocket, path):
         client_name = await websocket.recv()
 
         if client_name == "Controller":
-            await websocket.send(json.dumps([["turtles", used_names]]))
-            await websocket.recv()
-
-            await websocket.send(json.dumps([["block", blocks]]))
-            await websocket.recv()
-
-            await websocket.send(json.dumps([["pos", current_positions]]))
-            await websocket.recv()
-
-            await websocket.send(json.dumps([["inventory", inventory]]))
+            await websocket.send(json.dumps([["turtles", used_names], ["block", blocks], ["pos", current_positions], ["inventory", inventory]]))
             await websocket.recv()
         elif client_name == "Turtle":
             new_name = random.choice(available_names)
@@ -133,10 +118,12 @@ async def communications(websocket, path):
             outbound = []
 
             if client_name != "Controller":
-                # print(current_positions[client_name])
-
-                # outbound = "print('Idle...')"
-                # outbound = "print(turtle.data.getPos())"
+                if stopping:
+                    await websocket.send("turtle.mobility.home(turtle)")
+                    await websocket.close()
+                    used_names.remove(client_name)
+                    print("{} disconnected.".format(client_name))
+                    break
                 outbound = "turtle = turtle"  # noop
                 if len(commands) > 0:
                     if client_name in commands.keys():
@@ -244,6 +231,11 @@ async def main():
         command = await aioconsole.ainput("--")
         if command == "stop":
             stopping = True
+        while stopping:
+            await asyncio.sleep(0.1)
+            if len(used_names) == 0:
+                print("No turtles connected!\nClosing server...")
+                return
 
 
 def start():

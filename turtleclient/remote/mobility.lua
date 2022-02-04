@@ -23,11 +23,12 @@ local function report(turtle)
         end
     end
 
-    info = turtle.mobility.rot .. ";" .. turtle.data.getPos() .. ";" ..
-               turtle.data.getBlocks() .. ";" .. turtle.data.getInventory()
-    server.send(info)
-    msg, _ = server.receive()
-    -- print("Received and disregarding: " .. msg)
+    pcall(function()
+        info = turtle.mobility.rot .. ";" .. turtle.data.getPos() .. ";" ..
+                   turtle.data.getBlocks() .. ";" .. turtle.data.getInventory()
+        server.send(info)
+        msg, _ = server.receive()
+    end)
 end
 
 function mobility.turnLeft(turtle)
@@ -66,9 +67,13 @@ end
 function mobility.dig(turtle)
     local has_block, data = turtle.inspect()
 
-    if data.name == "minecraft:bedrock" or data.name ==
-        "enderstorage:ender_chest" or data.name ==
-        "forbidden_arcanus:stella_arcanum" then return false end
+    if has_block and
+        (data.name == "minecraft:bedrock" or data.name ==
+            "enderstorage:ender_chest" or data.name ==
+            "forbidden_arcanus:stella_arcanum" or
+            string.find(data.name, "computercraft", 1, true)) then
+        return false
+    end
 
     candig, reason = turtle.dig()
     if not candig then equipPick() end
@@ -79,9 +84,13 @@ end
 function mobility.digUp(turtle)
     local has_block, data = turtle.inspectUp()
 
-    if data.name == "minecraft:bedrock" or data.name ==
-        "enderstorage:ender_chest" or data.name ==
-        "forbidden_arcanus:stella_arcanum" then return false end
+    if has_block and
+        (data.name == "minecraft:bedrock" or data.name ==
+            "enderstorage:ender_chest" or data.name ==
+            "forbidden_arcanus:stella_arcanum" or
+            string.find(data.name, "computercraft", 1, true)) then
+        return false
+    end
 
     candig, reason = turtle.digUp()
     if not candig then equipPick() end
@@ -92,9 +101,13 @@ end
 function mobility.digDown(turtle)
     local has_block, data = turtle.inspectDown()
 
-    if data.name == "minecraft:bedrock" or data.name ==
-        "enderstorage:ender_chest" or data.name ==
-        "forbidden_arcanus:stella_arcanum" then return false end
+    if has_block and
+        (data.name == "minecraft:bedrock" or data.name ==
+            "enderstorage:ender_chest" or data.name ==
+            "forbidden_arcanus:stella_arcanum" or
+            string.find(data.name, "computercraft", 1, true)) then
+        return false
+    end
 
     candig, reason = turtle.digDown()
     if not candig then equipPick() end
@@ -182,6 +195,12 @@ function mobility.moveto(turtle, newPos)
             mobility.turnDeg(turtle, 180)
             mobility.forward(turtle)
         end
+    end
+    if newPos[2] > mobility.pos[2] then
+        while mobility.pos[2] < newPos[2] do mobility.up(turtle) end
+    end
+    if newPos[2] < mobility.pos[2] then
+        while mobility.pos[2] > newPos[2] do mobility.down(turtle) end
     end
     if newPos[3] > mobility.pos[3] then
         while mobility.pos[3] < newPos[3] do
