@@ -34,8 +34,17 @@ function connection()
             server.send("Turtle")
         end
 
+        msg, _ = server.receive()
+        load(msg)()
+
         while true do
-            if not turtle.logging.update_log(turtle) then break end
+            success, err = turtle.logging.update_log(turtle)
+            if not success then
+                local f = fs.open("err_" .. os.epoch("utc"), "w")
+                f.write(err)
+                f.close()
+                break
+            end
         end
 
         server.close()

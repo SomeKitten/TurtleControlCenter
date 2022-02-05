@@ -34,10 +34,6 @@ class State {
   }
 
   addBlock(render, pos, type) {
-    console.log(
-      "Adding block: " + type + " at " + pos[0] + ", " + pos[1] + ", " + pos[2]
-    );
-
     render.removeBlocks(
       this.scene,
       new this.THREE.Vector3(pos[0], pos[1], -pos[2])

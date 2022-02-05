@@ -43,6 +43,7 @@ turtle_names = [
     "Ugly Sweater",
     "<insert name>",
 ]
+connected_turtles = []
 used_names = []
 available_names = []
 turtle_count = 0
@@ -106,6 +107,8 @@ async def communications(websocket, path):
                 "rot": 90,
                 "pos": [0, 0, 0],
             }
+
+            connected_turtles.append(client_name)
         else:
             print("Welcome back, " + client_name + "!")
             if client_name in available_names:
@@ -118,44 +121,11 @@ async def communications(websocket, path):
                     "pos": [0, 0, 0],
                 }
 
+            connected_turtles.append(client_name)
+
+            await websocket.send("turtle = turtle")
+
         while True:
-            outbound = {}
-
-            if client_name != "Controller":
-                if stopping:
-                    await websocket.close()
-                    used_names.remove(client_name)
-                    print("{} disconnected.".format(client_name))
-                    break
-                outbound = "turtle = turtle"  # noop
-                if len(commands) > 0:
-                    if client_name in commands.keys():
-                        outbound = commands[client_name]
-                        del commands[client_name]
-            else:
-                if turtle_count < len(used_names):
-                    print("> TURTLES")
-
-                    outbound["turtles"] = used_names
-                    turtle_count = len(used_names)
-                while len(blocks) > block_index:
-                    print("> BLOCK")
-
-                    outbound["blocks"] = blocks[block_index:]
-                    block_index = len(blocks)
-                if inventory != previnventory:
-                    print("> INVENTORY")
-
-                    outbound["inventory"] = inventory
-
-                    for name in inventory:
-                        previnventory[name] = inventory[name]
-                outbound["pos"] = current_positions
-
-                outbound = json.dumps(outbound)
-
-            await websocket.send(outbound)
-
             inbound = await websocket.recv()
 
             if client_name == "Controller":
@@ -194,10 +164,42 @@ async def communications(websocket, path):
                     block_file.write(json.dumps(data))
                 for block in blocks:
                     if block[0] == current_positions[client_name]["pos"]:
-                        await set_block([pos, "minecraft:air"])
+                        await set_block([current_positions[client_name]["pos"], "minecraft:air"])
+
+            outbound = {}
+
+            if client_name != "Controller":
+                if stopping:
+                    await websocket.close()
+                    connected_turtles.remove(client_name)
+                    break
+                outbound = "turtle = turtle"  # noop
+                if len(commands) > 0:
+                    if client_name in commands.keys():
+                        outbound = commands[client_name]
+                        del commands[client_name]
+            else:
+                if turtle_count < len(used_names):
+                    outbound["turtles"] = used_names
+                    turtle_count = len(used_names)
+                while len(blocks) > block_index:
+                    outbound["blocks"] = blocks[block_index:]
+                    block_index = len(blocks)
+                if inventory != previnventory:
+                    outbound["inventory"] = inventory
+
+                    for name in inventory:
+                        previnventory[name] = inventory[name]
+                outbound["pos"] = current_positions
+
+                outbound = json.dumps(outbound)
+
+            await websocket.send(outbound)
     except websockets.exceptions.ConnectionClosed as e:
         print(e)
         print("> Client disconnected!")
+        if client_name != "Controller":
+            connected_turtles.remove(client_name)
         pass
 
 
@@ -209,7 +211,7 @@ async def main():
             stopping = True
         while stopping:
             await asyncio.sleep(0.1)
-            if len(used_names) == 0:
+            if len(connected_turtles) == 0:
                 print("No turtles connected!\nClosing server...")
                 return
 

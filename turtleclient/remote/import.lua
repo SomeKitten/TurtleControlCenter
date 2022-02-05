@@ -12,10 +12,12 @@ local files = {
     "json"
 }
 for _, f in ipairs(files) do
+    shell.run("rm " .. DIR .. "/" .. f .. ".lua")
     shell.run("wget http://server.cutekitten.space:25566/" .. DIR .. "/" .. f ..
                   ".lua " .. DIR .. "/" .. f .. ".lua")
 end
 shell.run("mkdir " .. "startup")
+shell.run("rm startup/" .. DIR .. ".lua")
 shell.run(
     "wget http://server.cutekitten.space:25566/" .. DIR .. "/startup.lua " ..
         "startup/" .. DIR .. ".lua")
