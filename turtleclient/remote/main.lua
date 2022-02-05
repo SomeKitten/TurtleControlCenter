@@ -1,12 +1,16 @@
+local json = require("json")
+
 turtle.util = require("util")
 
-turtle.data = require "data"
 turtle.mobility = require "mobility"
 turtle.logistics = require "logistics"
 turtle.replicate = require "replicate"
 turtle.mine = require "mine"
+turtle.logging = require "logging"
 
 turtle.packets = {}
+
+turtle.log_latest = {}
 
 function connection()
     print("Attempting connection...")
@@ -15,6 +19,15 @@ function connection()
     if server then
         print("Connected!")
 
+        if fs.exists("/info.txt") then
+            pcall(function()
+                local f = fs.open("info.txt", "r")
+                turtle.mobility.rot = tonumber(f.readLine())
+                turtle.mobility.pos = json.decode(f.readLine())
+                f.close()
+            end)
+        end
+
         if os.getComputerLabel() then
             server.send(os.getComputerLabel())
         else
@@ -22,32 +35,18 @@ function connection()
         end
 
         while true do
-            msg, _ = server.receive()
-
-            load(msg)()
-
-            info = turtle.mobility.rot .. ";" .. turtle.data.getPos() .. ";" ..
-                       turtle.data.getBlocks() .. ";" ..
-                       turtle.data.getInventory()
-
-            server.send(info)
-            -- f = io.open("turtle.info", "w")
-            -- f:write(info)
-            -- f:close()
+            if not turtle.logging.update_log(turtle) then break end
         end
+
+        server.close()
+
+        local f = fs.open("/info.txt", "w")
+        f.write(turtle.mobility.rot .. "\n")
+        f.write(json.encode(turtle.mobility.pos))
+        f.close()
     else
         print(fail_msg)
     end
-end
-
-if fs.exists("turtle.info") then
-    f = io.open("turtle.info", "r")
-    info = f:read()
-    f:close()
-
-    infot = turtle.util.strsplit(info, ";")
-    turtle.mobility.rot = tonumber(infot[1])
-    turtle.mobility.pos = turtle.util.strsplit(infot[2], ",")
 end
 
 while true do

@@ -74,6 +74,8 @@ class Render {
     autoMineRight.min = 1;
     autoMineRight.max = 20;
     this.controls.appendChild(autoMineRight);
+
+    this.materials = {};
   }
 
   loadTurtle(THREE, Turtle, state, loader, turtleSocket, scene) {
@@ -108,33 +110,29 @@ class Render {
   }
 
   blockHighlight(block) {
-    if (this.INTERSECTED)
-      this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
-
-    this.INTERSECTED = block.object;
-
-    this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
-    this.INTERSECTED.material.color.setHex(0xff0000);
-
-    for (let j = 0; j < this.state.blocks.length; j++) {
-      if (this.state.blocks[j][0] === this.INTERSECTED) {
-        console.log(this.state.blocks[j][1]);
-      }
-    }
+    // if (this.INTERSECTED)
+    //   this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
+    // this.INTERSECTED = block.object;
+    // this.INTERSECTED.currentHex = this.INTERSECTED.material.color.getHex();
+    // this.INTERSECTED.material.color.setHex(0xff0000);
+    // for (let j = 0; j < this.state.blocks.length; j++) {
+    //   if (this.state.blocks[j][0] === this.INTERSECTED) {
+    //     console.log(this.state.blocks[j][1]);
+    //   }
+    // }
   }
 
   updateTurtle(i) {
     const turtle = this.state.turtleNames[i];
 
-    const betweenPos = this.state.positions[turtle];
-    const pos = betweenPos.split(";")[1].split(",");
+    const pos = this.state.positions[turtle].pos;
     this.state.turtleModels[i].position.set(
       parseInt(pos[0]),
       parseInt(pos[1]),
       -parseInt(pos[2])
     );
 
-    this.state.turtles[i].rotation = parseInt(betweenPos.split(";")[0]);
+    this.state.turtles[i].rotation = this.state.positions[turtle].rot;
     this.state.turtles[i].updateRotation();
   }
 
@@ -281,7 +279,7 @@ class Render {
     if (
       !this.state.inventory[this.state.turtleNames[this.state.selectedTurtle]][
         x + 4 * y
-      ][0].endsWith("air")
+      ].name == ""
     ) {
       const textCanvas = document.createElement("canvas");
 
@@ -327,7 +325,10 @@ class Render {
     this.inventoryCxt.textBaseline = "middle";
     this.inventoryCxt.textAlign = "center";
 
-    if (Object.keys(this.state.inventory).length !== 0) {
+    if (
+      this.images[this.state.turtleNames[this.state.selectedTurtle]] !==
+      undefined
+    ) {
       for (let y = 0; y < 4; y++) {
         for (let x = 0; x < 4; x++) {
           if (
@@ -341,7 +342,7 @@ class Render {
               ],
               this.state.inventory[
                 this.state.turtleNames[this.state.selectedTurtle]
-              ][x + 4 * y][1],
+              ][x + 4 * y].count,
               x,
               y
             );
@@ -349,10 +350,10 @@ class Render {
             this.renderInventoryText(
               this.state.inventory[
                 this.state.turtleNames[this.state.selectedTurtle]
-              ][x + 4 * y][0].split(":")[1],
+              ][x + 4 * y].name.split(":")[1],
               this.state.inventory[
                 this.state.turtleNames[this.state.selectedTurtle]
-              ][x + 4 * y][1],
+              ][x + 4 * y].count,
               x,
               y
             );

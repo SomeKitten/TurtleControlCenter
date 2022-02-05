@@ -34,6 +34,10 @@ class State {
   }
 
   addBlock(render, pos, type) {
+    console.log(
+      "Adding block: " + type + " at " + pos[0] + ", " + pos[1] + ", " + pos[2]
+    );
+
     render.removeBlocks(
       this.scene,
       new this.THREE.Vector3(pos[0], pos[1], -pos[2])
@@ -41,23 +45,24 @@ class State {
 
     if (type !== "minecraft:air") {
       let texture;
-      if (this.fileExists("textures/block/" + type.split(":")[1] + ".png")) {
-        texture = new this.THREE.TextureLoader().load(
-          "textures/block/" + type.split(":")[1] + ".png"
-        );
-      } else {
-        texture = this.blockTextTexture(type.split(":")[1]);
+      if (render.materials[type] === undefined) {
+        if (this.fileExists("textures/block/" + type.split(":")[1] + ".png")) {
+          texture = new this.THREE.TextureLoader().load(
+            "textures/block/" + type.split(":")[1] + ".png"
+          );
+        } else {
+          texture = this.blockTextTexture(type.split(":")[1]);
+        }
+
+        texture.minFilter = this.THREE.NearestFilter;
+        texture.magFilter = this.THREE.NearestFilter;
+
+        render.materials[type] = new this.THREE.MeshBasicMaterial({
+          map: texture,
+        });
       }
 
-      texture.minFilter = this.THREE.NearestFilter;
-      texture.magFilter = this.THREE.NearestFilter;
-
-      const cube = new this.THREE.Mesh(
-        this.geometry,
-        new this.THREE.MeshBasicMaterial({
-          map: texture,
-        })
-      );
+      const cube = new this.THREE.Mesh(this.geometry, render.materials[type]);
 
       this.scene.add(cube);
       cube.position.set(pos[0], pos[1], -pos[2]);
@@ -68,8 +73,6 @@ class State {
   }
 
   addBlocks(render, new_blocks) {
-    console.log("Setting block!");
-
     for (let i = 0; i < new_blocks.length; i++) {
       if (typeof new_blocks[i] !== "string") {
         this.addBlock(render, new_blocks[i][0], new_blocks[i][1]);
@@ -98,8 +101,6 @@ class State {
   }
 
   setPos(pos) {
-    console.log("Setting pos!");
-
     this.positions = pos;
   }
 
@@ -127,14 +128,13 @@ class State {
         imgs[x + 4 * y] = document.createElement("img");
         this.getImageFromItem(
           imgs[x + 4 * y],
-          items[x + 4 * y][0].split(":")[1]
+          items[x + 4 * y].name.split(":")[1]
         );
       }
     }
   }
 
   setInventory(render, inv) {
-    console.log("Setting inventory!");
     this.inventory = inv;
 
     for (let i = 0; i < this.turtleNames.length; i++) {

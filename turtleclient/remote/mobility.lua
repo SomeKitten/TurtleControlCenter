@@ -2,7 +2,7 @@ local mobility = {}
 mobility.pos = {0, 0, 0}
 mobility.rot = 90
 
-local function report(turtle)
+local function update(turtle)
     if turtle.getItemCount(16) == 0 then
         local has_block, data = turtle.inspectDown()
         if has_block and
@@ -23,26 +23,21 @@ local function report(turtle)
         end
     end
 
-    pcall(function()
-        info = turtle.mobility.rot .. ";" .. turtle.data.getPos() .. ";" ..
-                   turtle.data.getBlocks() .. ";" .. turtle.data.getInventory()
-        server.send(info)
-        msg, _ = server.receive()
-    end)
+    turtle.logging.update_log(turtle)
 end
 
 function mobility.turnLeft(turtle)
     turtle.turnLeft()
     mobility.rot = mobility.rot + 90
     if mobility.rot == 360 then mobility.rot = 0 end
-    report(turtle)
+    update(turtle)
 end
 
 function mobility.turnRight(turtle)
     turtle.turnRight()
     mobility.rot = mobility.rot - 90
     if mobility.rot == -90 then mobility.rot = 270 end
-    report(turtle)
+    update(turtle)
 end
 
 function mobility.turnDeg(turtle, deg)
@@ -53,7 +48,7 @@ function mobility.turnDeg(turtle, deg)
     else
         while mobility.rot ~= deg do mobility.turnRight(turtle) end
     end
-    report(turtle)
+    update(turtle)
 end
 
 function equipPick()
@@ -78,6 +73,8 @@ function mobility.dig(turtle)
     candig, reason = turtle.dig()
     if not candig then equipPick() end
 
+    turtle.logging.update_log(turtle)
+
     return true
 end
 
@@ -95,6 +92,8 @@ function mobility.digUp(turtle)
     candig, reason = turtle.digUp()
     if not candig then equipPick() end
 
+    turtle.logging.update_log(turtle)
+
     return true
 end
 
@@ -111,6 +110,8 @@ function mobility.digDown(turtle)
 
     candig, reason = turtle.digDown()
     if not candig then equipPick() end
+
+    turtle.logging.update_log(turtle)
 
     return true
 end
@@ -140,7 +141,7 @@ function mobility.forward(turtle)
 
     forwardGPS(turtle)
 
-    report(turtle)
+    update(turtle)
 end
 
 function mobility.back(turtle)
@@ -156,7 +157,7 @@ function mobility.back(turtle)
         backGPS(turtle)
     end
 
-    report(turtle)
+    update(turtle)
 end
 
 function mobility.up(turtle)
@@ -166,7 +167,7 @@ function mobility.up(turtle)
 
     upGPS(turtle)
 
-    report(turtle)
+    update(turtle)
 end
 
 function mobility.down(turtle)
@@ -178,12 +179,18 @@ function mobility.down(turtle)
 
     downGPS(turtle)
 
-    report(turtle)
+    update(turtle)
 end
 
 function mobility.moveto(turtle, newPos)
     print("Coming from: " .. turtle.mobility.pos[1] .. "," ..
               turtle.mobility.pos[2] .. "," .. turtle.mobility.pos[3])
+    if newPos[2] > mobility.pos[2] then
+        while mobility.pos[2] < newPos[2] do mobility.up(turtle) end
+    end
+    if newPos[2] < mobility.pos[2] then
+        while mobility.pos[2] > newPos[2] do mobility.down(turtle) end
+    end
     if newPos[1] > mobility.pos[1] then
         while mobility.pos[1] < newPos[1] do
             mobility.turnDeg(turtle, 0)
@@ -195,12 +202,6 @@ function mobility.moveto(turtle, newPos)
             mobility.turnDeg(turtle, 180)
             mobility.forward(turtle)
         end
-    end
-    if newPos[2] > mobility.pos[2] then
-        while mobility.pos[2] < newPos[2] do mobility.up(turtle) end
-    end
-    if newPos[2] < mobility.pos[2] then
-        while mobility.pos[2] > newPos[2] do mobility.down(turtle) end
     end
     if newPos[3] > mobility.pos[3] then
         while mobility.pos[3] < newPos[3] do
