@@ -81,13 +81,14 @@ export class State {
 
       render.cubes.push(cube)
       this.blocks.push([cube, type])
+    } else {
+      render.removeBlocks(this.scene, new Vector3(pos[0], pos[1], -pos[2]))
     }
   }
 
   addBlocks(render: Render, new_blocks: [number[], string][]) {
-    console.log(new_blocks.length)
     for (let i = 0; i < new_blocks.length; i++) {
-      if (i % 1000 === 0) {
+      if (i % 1000 === 999) {
         console.log(`${(i / new_blocks.length) * 100}%`)
       }
       this.addBlock(render, new_blocks[i][0], new_blocks[i][1])
@@ -135,11 +136,16 @@ export class State {
   }
 
   // TODO make type for "items"
-  getImagesFromItems(imgs: HTMLImageElement[], items: { name: string; count: number }[]) {
+  getImagesFromItems(render: Render, imgs: HTMLImageElement[], items: { name: string; count: number }[]) {
     for (let y = 0; y < 4; y++) {
       for (let x = 0; x < 4; x++) {
-        imgs[x + 4 * y] = document.createElement('img')
-        this.getImageFromItem(imgs[x + 4 * y], items[x + 4 * y].name.split(':')[1])
+        if (render.imageCache[items[y * 4 + x].name] === undefined) {
+          imgs[x + 4 * y] = document.createElement('img')
+          this.getImageFromItem(imgs[x + 4 * y], items[x + 4 * y].name.split(':')[1])
+          render.imageCache[items[y * 4 + x].name] = imgs[x + 4 * y]
+        } else {
+          imgs[x + 4 * y] = render.imageCache[items[y * 4 + x].name]
+        }
       }
     }
   }
@@ -152,7 +158,7 @@ export class State {
       if (this.inventory[name].length > 0) {
         render.images[name] = []
 
-        this.getImagesFromItems(render.images[name], this.inventory[name])
+        this.getImagesFromItems(render, render.images[name], this.inventory[name])
       }
     }
   }

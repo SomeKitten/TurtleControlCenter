@@ -62,22 +62,15 @@ stopping = False
 
 async def set_block(block):
     global block_index
-    if block[1] != "minecraft:air":
-        for b in blocks:
-            if b[0] == block[0]:
-                if b[1] != block[1]:
-                    blocks.remove(b)
-                    blocks.append(block)
-                    block_index = max(0, block_index - 1)
-                    return
-                return
-        blocks.append(block)
-    else:
-        for b in blocks:
-            if b[0] == block[0]:
+    for b in blocks:
+        if b[0] == block[0]:
+            if b[1] != block[1]:
                 blocks.remove(b)
+                blocks.append([block[0], "minecraft:air"])
                 block_index = max(0, block_index - 1)
+            else:
                 return
+    blocks.append(block)
     return
 
 
@@ -171,7 +164,7 @@ async def communications(websocket, path):
                 with open("blocks.json", "w") as block_file:
                     data = {
                         "turtles": current_positions,
-                        "blocks": blocks
+                        "blocks": list(filter(lambda b: b[1] != "minecraft:air", blocks))
                     }
                     block_file.write(json.dumps(data))
                 for block in blocks:

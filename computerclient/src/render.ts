@@ -27,6 +27,7 @@ export class Render {
   autoMineForward: HTMLInputElement
   autoMineRight: HTMLInputElement
   materials: any
+  imageCache: { [key: string]: HTMLImageElement }
 
   constructor(scene: Scene, state: State) {
     this.scene = scene
@@ -107,6 +108,8 @@ export class Render {
     this.controls.appendChild(this.autoMineRight)
 
     this.materials = {}
+
+    this.imageCache = {}
   }
 
   loadTurtle(state: State, loader: GLTFLoader, turtleSocket: WebSocket, scene: Scene) {
