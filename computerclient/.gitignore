@@ -1,5 +1,5 @@
 node_modules
-/build
-*.log*
 .DS_Store
-*.code-workspace
+dist
+dist-ssr
+*.local
