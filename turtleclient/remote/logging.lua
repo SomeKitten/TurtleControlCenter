@@ -2,6 +2,8 @@ local json = require("json")
 
 local logging = {}
 
+logging.log_latest = ""
+
 function logging.getInventory()
     local inv = {}
 
@@ -33,24 +35,31 @@ function logging.getBlocks()
     }
 end
 
+function logging.log(turtle, message)
+    print(message)
+    turtle.logging.log_latest = "[" ..
+                                    textutils.formatTime(os.time("local"), true) ..
+                                    "] " .. message
+    turtle.logging.update_log()
+    turtle.logging.log_latest = ""
+end
+
 function logging.update_log(turtle)
     return pcall(function()
+        if turtle.logging.log_latest ~= "" then
+            local f = fs.open("latest.log", "a")
+            f.write(turtle.logging.log_latest .. "\n")
+            f.close()
+            turtle.logging.log_latest = ""
+        end
+
         info = json.encode({
             pos = turtle.mobility.pos,
             rot = turtle.mobility.rot,
             blocks = turtle.logging.getBlocks(),
             inventory = turtle.logging.getInventory(),
-            log = turtle.log_latest
+            log = turtle.logging.log_latest
         })
-
-        local f = fs.open("latest.log", "a")
-        for _, line in ipairs(turtle.log_latest) do
-            f.write(
-                "[" .. textutils.formatTime(os.time("local"), true) .. "] " ..
-                    line .. "\n")
-        end
-
-        turtle.log_latest = {}
 
         server.send(info)
         msg, _ = server.receive()

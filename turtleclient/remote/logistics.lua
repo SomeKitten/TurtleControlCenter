@@ -7,30 +7,42 @@ function logistics.placeUp(turtle)
     local oldSelect = turtle.getSelectedSlot()
     while turtle.detectUp() do
         turtle.select(1)
-        turtle.mobility.digUp(turtle)
+        if not turtle.mobility.digUp(turtle) then
+            turtle.select(oldSelect)
+            return false
+        end
     end
     turtle.select(oldSelect)
     turtle.placeUp()
+    return true
 end
 
 function logistics.place(turtle)
     local oldSelect = turtle.getSelectedSlot()
     while turtle.detect() do
         turtle.select(1)
-        turtle.mobility.dig(turtle)
+        if not turtle.mobility.dig(turtle) then
+            turtle.select(oldSelect)
+            return false
+        end
     end
     turtle.select(oldSelect)
     turtle.place()
+    return true
 end
 
 function logistics.placeDown(turtle)
     local oldSelect = turtle.getSelectedSlot()
     while turtle.detectDown() do
         turtle.select(1)
-        turtle.mobility.digDown(turtle)
+        if not turtle.mobility.digDown(turtle) then
+            turtle.select(oldSelect)
+            return false
+        end
     end
     turtle.select(oldSelect)
     turtle.placeDown()
+    return true
 end
 
 function logistics.count(turtle, type)
@@ -60,7 +72,7 @@ function logistics.countAll(turtle)
 end
 
 function logistics.clearWaste(turtle)
-    print("Clearing inventory!")
+    turtle.logging.log(turtle, "Clearing inventory!")
 
     local oldPos = {
         turtle.mobility.pos[1], turtle.mobility.pos[2], turtle.mobility.pos[3]
@@ -80,11 +92,11 @@ function logistics.clearWaste(turtle)
                 local name = turtle.getItemDetail(i).name
                 if name == "minecraft:cobblestone" or
                     turtle.getItemDetail(i, true).tags["forge:stone"] then
-                    print("Trashed " .. name)
+                    turtle.logging.log(turtle, "Trashed " .. name)
                     turtle.select(i)
                     turtle.drop()
                 else
-                    print("Stored " .. name)
+                    turtle.logging.log(turtle, "Stored " .. name)
                     turtle.select(i)
                     turtle.dropDown()
                 end
@@ -103,11 +115,11 @@ function logistics.clearWaste(turtle)
                 if name == "minecraft:cobblestone" or name == "minecraft:gravel" or
                     name == "minecraft:dirt" or
                     turtle.getItemDetail(i, true).tags["forge:stone"] then
-                    print("Trashed " .. name)
+                    turtle.logging.log(turtle, "Trashed " .. name)
                     turtle.select(i)
                     turtle.drop()
                 else
-                    print("Stored " .. name)
+                    turtle.logging.log(turtle, "Stored " .. name)
                     turtle.select(i)
                     turtle.dropDown()
                 end
@@ -129,7 +141,7 @@ function logistics.sort()
     end
 
     if #emptySpaces == 0 then
-        print("FULL")
+        turtle.logging.log(turtle, "FULL")
         turtle.logistics.stop = true
     end
     while #emptySpaces > 0 do
@@ -187,7 +199,7 @@ function logistics.refuel()
         turtle.refuel(1)
     end
     while turtle.getFuelLevel() == 0 do
-        print("REFUEL ME!")
+        turtle.logging.log(turtle, "REFUEL ME!")
 
         os.queueEvent("randomEvent")
         os.pullEvent()

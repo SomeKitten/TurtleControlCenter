@@ -51,6 +51,14 @@ class Render {
     };
     this.controls.appendChild(clearWaste);
 
+    returnHome = document.createElement("button");
+    returnHome.id = "return-home";
+    returnHome.innerHTML = "Return Home";
+    returnHome.onclick = () => {
+      state.turtles[state.selectedTurtle].returnHome();
+    };
+    this.controls.appendChild(returnHome);
+
     autoMine = document.createElement("button");
     autoMine.id = "auto-mine";
     autoMine.innerHTML = "Auto Mine";

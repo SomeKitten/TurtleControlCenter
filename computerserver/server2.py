@@ -1,4 +1,5 @@
 import asyncio
+import os
 import random
 
 import websockets
@@ -88,6 +89,7 @@ async def communications(websocket, path):
         client_name = await websocket.recv()
 
         if client_name == "Controller":
+            block_index = len(blocks)
             await websocket.send(json.dumps({
                 "turtles": used_names,
                 "blocks": blocks,
@@ -109,6 +111,9 @@ async def communications(websocket, path):
             }
 
             connected_turtles.append(client_name)
+
+            if not os.path.exists(client_name):
+                os.mkdir(client_name)
         else:
             print("Welcome back, " + client_name + "!")
             if client_name in available_names:
@@ -124,6 +129,9 @@ async def communications(websocket, path):
             connected_turtles.append(client_name)
 
             await websocket.send("turtle = turtle")
+
+            if not os.path.exists(client_name):
+                os.mkdir(client_name)
 
         while True:
             inbound = await websocket.recv()
@@ -154,6 +162,10 @@ async def communications(websocket, path):
                     await set_block([[current_positions[client_name]["pos"][0], current_positions[client_name]["pos"][1] + 1, current_positions[client_name]["pos"][2]], data["blocks"][2]])
                 if "inventory" in data.keys():
                     inventory[client_name] = data["inventory"]
+                if "log" in data.keys():
+                    with open(client_name + "/latest.log", "a") as f:
+                        if data["log"] != "":
+                            f.write(data["log"] + "\n")
 
                 # TODO turn into database
                 with open("blocks.json", "w") as block_file:
@@ -217,8 +229,7 @@ async def main():
 
 
 def start():
-    global available_names
-    global blocks, positions, current_positions
+    global available_names, blocks, positions, current_positions, block_index
 
     available_names = turtle_names
 
@@ -230,6 +241,7 @@ def start():
             for block in blocks:
                 if block[1] == "minecraft:air" or str.startswith(block[1], "computercraft:"):
                     blocks.remove(block)
+            block_index = len(blocks)
     except FileNotFoundError:
         pass
 

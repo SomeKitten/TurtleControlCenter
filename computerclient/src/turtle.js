@@ -73,6 +73,10 @@ class Turtle {
     this.webSocket.send(this.name + `;turtle.logistics.clearWaste(turtle)`);
   }
 
+  returnHome() {
+    this.webSocket.send(this.name + `;turtle.mobility.home(turtle)`);
+  }
+
   updateRotation() {
     this.model.rotation.y = ((this.rotation - 90) * Math.PI) / 180;
   }

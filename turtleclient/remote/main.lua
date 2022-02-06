@@ -10,8 +10,6 @@ turtle.logging = require "logging"
 
 turtle.packets = {}
 
-turtle.log_latest = {}
-
 function connection()
     print("Attempting connection...")
     server, fail_msg = http.websocket("ws://server.cutekitten.space:63617")
@@ -21,7 +19,7 @@ function connection()
 
         if fs.exists("/info.txt") then
             pcall(function()
-                local f = fs.open("info.txt", "r")
+                local f = fs.open("/info.txt", "r")
                 turtle.mobility.rot = tonumber(f.readLine())
                 turtle.mobility.pos = json.decode(f.readLine())
                 f.close()
@@ -40,7 +38,7 @@ function connection()
         while true do
             success, err = turtle.logging.update_log(turtle)
             if not success then
-                local f = fs.open("err_" .. os.epoch("utc"), "w")
+                local f = fs.open("/err_" .. os.epoch("utc"), "w")
                 f.write(err)
                 f.close()
                 break

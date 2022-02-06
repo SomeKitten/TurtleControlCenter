@@ -183,8 +183,6 @@ function mobility.down(turtle)
 end
 
 function mobility.moveto(turtle, newPos)
-    print("Coming from: " .. turtle.mobility.pos[1] .. "," ..
-              turtle.mobility.pos[2] .. "," .. turtle.mobility.pos[3])
     if newPos[2] > mobility.pos[2] then
         while mobility.pos[2] < newPos[2] do mobility.up(turtle) end
     end
@@ -218,7 +216,7 @@ function mobility.moveto(turtle, newPos)
 end
 
 function mobility.home(turtle)
-    print("Returning home!")
+    turtle.logging.log(turtle, "Returning home!")
     mobility.moveto(turtle, {0, 0, 0})
     -- mobility.turnDeg(turtle, 90)
 end
