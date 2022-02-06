@@ -53,9 +53,10 @@ end
 
 function equipPick()
     if reason == "No tool to dig with" then
-        turtle.select(turtle.logistics.find("minecraft:diamond_pickaxe"))
-        turtle.equipRight()
-        turtle.dig()
+        if turtle.logistics.find("minecraft:diamond_pickaxe") then
+            turtle.select(turtle.logistics.find("minecraft:diamond_pickaxe"))
+            turtle.equipRight()
+        end
     end
 end
 
@@ -71,7 +72,10 @@ function mobility.dig(turtle)
     end
 
     candig, reason = turtle.dig()
-    if not candig then equipPick() end
+    if not candig then
+        equipPick()
+        return false
+    end
 
     turtle.logging.update_log(turtle)
 
@@ -90,7 +94,10 @@ function mobility.digUp(turtle)
     end
 
     candig, reason = turtle.digUp()
-    if not candig then equipPick() end
+    if not candig then
+        equipPick()
+        return false
+    end
 
     turtle.logging.update_log(turtle)
 
@@ -109,7 +116,10 @@ function mobility.digDown(turtle)
     end
 
     candig, reason = turtle.digDown()
-    if not candig then equipPick() end
+    if not candig then
+        equipPick()
+        return false
+    end
 
     turtle.logging.update_log(turtle)
 

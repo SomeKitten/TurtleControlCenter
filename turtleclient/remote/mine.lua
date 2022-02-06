@@ -11,10 +11,10 @@ function mine.mine(forward, right)
 
                 turtle.mobility.forward(turtle)
 
-                if turtle.getItemCount(16) > 0 then
+                if turtle.getItemCount(14) > 0 then
                     turtle.logistics.clearWaste(turtle)
 
-                    if turtle.getItemCount(16) > 0 then
+                    if turtle.getItemCount(14) > 0 then
                         return
                     end
                 end

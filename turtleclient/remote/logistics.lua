@@ -94,7 +94,7 @@ function logistics.clearWaste(turtle)
                     turtle.getItemDetail(i, true).tags["forge:stone"] then
                     turtle.logging.log(turtle, "Trashed " .. name)
                     turtle.select(i)
-                    turtle.drop()
+                    turtle.dropUp()
                 else
                     turtle.logging.log(turtle, "Stored " .. name)
                     turtle.select(i)
@@ -117,7 +117,7 @@ function logistics.clearWaste(turtle)
                     turtle.getItemDetail(i, true).tags["forge:stone"] then
                     turtle.logging.log(turtle, "Trashed " .. name)
                     turtle.select(i)
-                    turtle.drop()
+                    turtle.dropUp()
                 else
                     turtle.logging.log(turtle, "Stored " .. name)
                     turtle.select(i)
