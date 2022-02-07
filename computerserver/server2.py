@@ -82,6 +82,7 @@ async def communications(websocket, path):
         client_name = await websocket.recv()
 
         if client_name == "Controller":
+            blocks = list(filter(lambda b: b[1] != "minecraft:air", blocks))
             block_index = len(blocks)
             await websocket.send(json.dumps({
                 "turtles": used_names,
@@ -156,8 +157,8 @@ async def communications(websocket, path):
                 if "inventory" in data.keys():
                     inventory[client_name] = data["inventory"]
                 if "log" in data.keys():
-                    with open(client_name + "/latest.log", "a") as f:
-                        if data["log"] != "":
+                    if data["log"] != "":
+                        with open(client_name + "/latest.log", "a") as f:
                             f.write(data["log"] + "\n")
 
                 # TODO turn into database

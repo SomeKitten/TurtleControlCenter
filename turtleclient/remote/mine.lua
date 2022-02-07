@@ -5,9 +5,10 @@ function mine.mine(forward, right)
     for x = 1, right do
         for y = 1, forward - 1 do
             if not turtle.logistics.stop then
-                turtle.logging.log(turtle, math.floor(
-                                       (((x - 1) * forward + y - 1) /
-                                           (right * forward)) * 100) .. "%")
+                turtle.logging.log(turtle, "Mining: " ..
+                                       math.floor(
+                                           (((x - 1) * forward + y - 1) /
+                                               (right * forward)) * 100) .. "%")
 
                 turtle.mobility.forward(turtle)
 
