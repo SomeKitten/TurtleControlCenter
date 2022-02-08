@@ -1,4 +1,5 @@
--- wget run "http://server.cutekitten.space:25566/cconly1.12.2/import.lua"
+-- wget "http://server.cutekitten.space:25566/cconly1.12.2/import.lua" import.lua
+-- ./import
 -- turtle requirements...
 -- 
 DIR = "cconly1.12.2"

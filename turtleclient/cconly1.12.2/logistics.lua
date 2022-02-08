@@ -211,4 +211,64 @@ function logistics.refuel()
     end
 end
 
+function logistics.autoSieve(turtle)
+    while true do
+        local dropped = false
+        local found = turtle.logistics.find("minecraft:gravel")
+        if not found then
+            found = turtle.logistics.find("exnihilocreatio:block_dust")
+        end
+        if found then
+            turtle.select(found)
+            dropped = turtle.drop()
+        end
+        if not dropped then
+            turtle.select(1)
+            turtle.suck()
+        else
+            if turtle.getItemCount(2) == 0 then
+                turtle.select(2)
+                turtle.mobility.turnRight(turtle)
+                turtle.mobility.turnRight(turtle)
+                turtle.suck()
+                turtle.mobility.turnRight(turtle)
+                turtle.mobility.turnRight(turtle)
+            end
+        end
+        if turtle.getItemCount(16) > 0 then
+            turtle.mobility.turnRight(turtle)
+            for i = 3, 16 do
+                turtle.select(i)
+                turtle.drop()
+            end
+            turtle.mobility.turnLeft(turtle)
+        end
+    end
+end
+
+function logistics.layRail(turtle)
+    i = 0
+    local slot
+    while true do
+        if i % 8 == 0 then
+            slot = turtle.logistics.find("minecraft:golden_rail")
+            if slot then
+                turtle.select(slot)
+                turtle.logistics.placeUp(turtle)
+            end
+        end
+        if i % 8 == 1 then
+            slot = turtle.logistics.find("minecraft:golden_rail")
+        else
+            slot = turtle.logistics.find("minecraft:rail")
+        end
+        if not slot then break end
+        turtle.select(slot)
+        placed = turtle.logistics.place(turtle)
+        if not placed then break end
+        turtle.mobility.back(turtle)
+        i = i + 1
+    end
+end
+
 return logistics

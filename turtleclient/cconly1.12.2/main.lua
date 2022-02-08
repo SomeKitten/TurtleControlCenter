@@ -5,4 +5,6 @@ turtle.logistics = require "logistics"
 turtle.mine = require "mine"
 turtle.logging = require "logging"
 
-turtle.mine.forward(turtle)
+-- turtle.logistics.autoSieve(turtle)
+turtle.logistics.layRail(turtle)
+-- turtle.mine.forward(turtle)
