@@ -41,6 +41,13 @@ function logging.log(turtle, message)
     turtle.logging.update_log(turtle)
 end
 
+function logging.update_pos(turtle)
+    local f = fs.open("/info.txt", "w")
+    f.write(turtle.mobility.rot .. "\n")
+    f.write(json.encode(turtle.mobility.pos))
+    f.close()
+end
+
 function logging.update_log(turtle)
     if turtle.logging.log_latest ~= "" then
         local f = fs.open("latest.log", "a")
@@ -57,6 +64,8 @@ function logging.update_log(turtle)
     })
 
     turtle.logging.log_latest = ""
+
+    turtle.logging.update_pos(turtle)
 
     local msg, _
 

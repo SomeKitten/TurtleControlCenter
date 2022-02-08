@@ -20,14 +20,17 @@ local function connection()
         end)
     end
 
-    while true do turtle.logging.update_log(turtle) end
+    while true do
+        a, b = pcall(function() turtle.logging.update_log(turtle) end)
+        if not a then
+            print(b)
+            break
+        end
+    end
 
     server.close()
 
-    local f = fs.open("/info.txt", "w")
-    f.write(turtle.mobility.rot .. "\n")
-    f.write(json.encode(turtle.mobility.pos))
-    f.close()
+    turtle.logging.update_pos(turtle)
 end
 
 connection()

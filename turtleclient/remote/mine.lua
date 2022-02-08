@@ -1,5 +1,6 @@
 local mine = {}
 
+-- TODO update to be synced with turtle.mobility.pos
 function mine.mine(forward, right)
     turtle.select(1)
     for x = 1, right do
