@@ -141,10 +141,12 @@ local function upGPS(turtle) mobility.pos[2] = mobility.pos[2] + 1 end
 
 local function downGPS(turtle) mobility.pos[2] = mobility.pos[2] - 1 end
 
-function mobility.forward(turtle)
+function mobility.forward(turtle, force)
     turtle.logistics.refuel()
 
-    while not turtle.forward() do if not mobility.dig(turtle) then return end end
+    while not turtle.forward() do
+        if not mobility.dig(turtle) and not force then return end
+    end
 
     forwardGPS(turtle)
 

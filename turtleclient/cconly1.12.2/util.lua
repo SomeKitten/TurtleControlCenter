@@ -13,4 +13,6 @@ function u.ends_with(str, ending)
     return ending == "" or str:sub(-#ending) == ending
 end
 
+function u.trimstring(s) return s:match '^%s*(.*%S)' or '' end
+
 return u

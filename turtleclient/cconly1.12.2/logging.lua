@@ -37,20 +37,28 @@ end
 
 function logging.log(turtle, message)
     print(message)
-    turtle.logging.log_latest = "[" .. os.date("%D %R") .. "] " .. message
+    turtle.logging.log_latest = "[" .. os.day() .. " " ..
+                                    textutils.formatTime(os.time(), true) ..
+                                    "] " .. message
     turtle.logging.update_log(turtle)
 end
 
 function logging.update_pos(turtle)
-    local f = fs.open("/info.txt", "w")
-    f.write(turtle.mobility.rot .. "\n")
-    f.write(json.encode(turtle.mobility.pos))
-    f.close()
+    if turtle.mobility.pos and turtle.mobility.rot then
+        local f = fs.open("/info.txt", "w")
+        f.write(turtle.mobility.rot .. "\n")
+        f.write(json.encode(turtle.mobility.pos))
+        f.close()
+    end
 end
 
 function logging.update_log(turtle)
     if turtle.logging.log_latest ~= "" then
-        local f = fs.open("latest.log", "a")
+        if fs.exists("/latest.log") then
+            fs.delete("/latest.log.bak")
+            fs.copy("/latest.log", "/latest.log.bak")
+        end
+        local f = fs.open("/latest.log", "a")
         f.write(turtle.logging.log_latest .. "\n")
         f.close()
     end

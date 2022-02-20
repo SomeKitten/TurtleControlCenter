@@ -9,8 +9,7 @@ shell.run("cd /")
 shell.run("rm " .. DIR)
 shell.run("mkdir " .. DIR)
 local files = {
-    "main", "mobility", "logistics", "replicate", "logging", "util", "mine",
-    "json"
+    "main", "mobility", "logistics", "logging", "util", "mine", "json"
 }
 for _, f in ipairs(files) do
     shell.run("rm " .. DIR .. "/" .. f .. ".lua")

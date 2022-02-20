@@ -113,8 +113,7 @@ function logistics.clearWaste(turtle)
             if turtle.getItemCount(i) > 0 then
                 local name = turtle.getItemDetail(i).name
                 if name == "minecraft:cobblestone" or name == "minecraft:gravel" or
-                    name == "minecraft:dirt" or
-                    turtle.getItemDetail(i, true).tags["forge:stone"] then
+                    name == "minecraft:dirt" then
                     turtle.logging.log(turtle, "Trashed " .. name)
                     turtle.select(i)
                     turtle.dropUp()
@@ -186,10 +185,12 @@ function logistics.sorted(turtle)
     return sorted
 end
 
-function logistics.find(item)
-    for i = 1, 16 do
-        if turtle.getItemDetail(i) ~= nil and turtle.getItemDetail(i).name ==
-            item then return i end
+function logistics.find(item, start)
+    if start == nil then start = 1 end
+    for i = start, 16 do
+        if turtle.getItemCount(i) > 0 and turtle.getItemDetail(i).name == item then
+            return i
+        end
     end
 end
 
@@ -251,7 +252,7 @@ function logistics.layRail(turtle)
     local slot
     while true do
         if i % 8 == 0 then
-            slot = turtle.logistics.find("minecraft:golden_rail")
+            slot = turtle.logistics.find("minecraft:redstone_torch")
             if slot then
                 turtle.select(slot)
                 turtle.logistics.placeUp(turtle)
@@ -268,6 +269,90 @@ function logistics.layRail(turtle)
         if not placed then break end
         turtle.mobility.back(turtle)
         i = i + 1
+    end
+end
+
+function logistics.layBlock(turtle, block)
+    i = 0
+    local slot
+    while true do
+        slot = turtle.logistics.find(block)
+        if not slot then break end
+        turtle.select(slot)
+        placed = turtle.logistics.place(turtle)
+        while true do
+            logistics.refuel()
+            if turtle.back() then break end
+        end
+        i = i + 1
+        turtle.logging.log(turtle, "Placed: " .. i)
+    end
+end
+
+function logistics.craftsetup(turtle, recipefile)
+    local recipe = {}
+
+    local file = fs.open(recipefile, "r")
+    local line, split, a
+    for y = 1, 3 do
+        line = file.readLine()
+        if line ~= nil then
+            split = turtle.util.strsplit(line .. " ", ",")
+            for x = 1, 3 do
+                a = turtle.util.trimstring(split[x])
+                if not recipe[a] then recipe[a] = {} end
+                table.insert(recipe[a], {x, y})
+            end
+        end
+    end
+
+    local found
+    for item, locations in pairs(recipe) do
+        if item ~= "" then
+            found = turtle.logistics.find(item)
+
+            if not found then return false end
+
+            turtle.select(found)
+            turtle.transferTo(16)
+            turtle.select(16)
+
+            for _, location in ipairs(locations) do
+                if not turtle.transferTo(location[1] + (location[2] - 1) * 4, 1) then
+                    return false
+                end
+            end
+
+            turtle.dropDown()
+        end
+    end
+
+    for _, location in ipairs(recipe[""]) do
+        turtle.select(location[1] + (location[2] - 1) * 4)
+        turtle.dropDown()
+    end
+
+    for i = 1, 3 do
+        turtle.select(4 + (i - 1) * 4)
+        turtle.dropDown()
+    end
+    for i = 1, 4 do
+        turtle.select(i + 12)
+        turtle.dropDown()
+    end
+
+    return true
+end
+
+function logistics.craft(turtle, recipefile)
+    while true do
+        if not turtle.logistics.craftsetup(turtle, recipefile) then
+            for i = 1, 16 do
+                turtle.select(i)
+                turtle.dropDown()
+            end
+            for i = 1, 15 do turtle.suckDown() end
+        end
     end
 end
 
